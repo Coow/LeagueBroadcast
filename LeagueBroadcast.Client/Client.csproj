@@ -1,0 +1,89 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <MinimumPlatformVersion>10.0.18362.0</MinimumPlatformVersion>
+    <AssemblyName>LeagueBroadcast</AssemblyName>
+    <ApplicationIcon>Assets\Icons\BlueEssence.ico</ApplicationIcon>
+    <Description>League Broadcast Tools used for streaming LoL Spectator</Description>
+    <PackageProjectUrl>https://github.com/floh22/LeagueBroadcast</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/floh22/LeagueBroadcast</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageIcon>BE_icon.png</PackageIcon>
+    <Copyright>GPLv3</Copyright>
+    <Authors>Lars Eble</Authors>
+    <Company />
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <DebugType>embedded</DebugType>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <AssemblyVersion>2.0.1</AssemblyVersion>
+    <FileVersion>2.0.1</FileVersion>
+    <StartupObject>Client.App</StartupObject>
+    <ApplicationManifest>AppManifest.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Icons\BlueEssence.ico" />
+    <None Remove="Assets\Icons\JglIcon.ico" />
+    <None Remove="Assets\Icons\LeagueNew.ico" />
+    <None Remove="Assets\Icons\MidIcon.ico" />
+    <None Remove="Assets\Images\ArrowsDown.png" />
+    <None Remove="Assets\Images\ArrowsDownWhite.png" />
+    <None Remove="Assets\Images\BE_icon.png" />
+    <None Remove="Assets\Images\LeagueOfLegendsIcon.png" />
+    <None Remove="Assets\Images\TwitterSocial.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Icons\BlueEssence.ico" />
+    <Resource Include="Assets\Icons\JglIcon.ico" />
+    <Resource Include="Assets\Icons\LeagueNew.ico" />
+    <Resource Include="Assets\Icons\MidIcon.ico" />
+    <Resource Include="Assets\Images\ArrowsDown.png" />
+    <Resource Include="Assets\Images\ArrowsDownWhite.png" />
+    <Resource Include="Assets\Images\BE_icon.png" />
+    <Resource Include="Assets\Images\LeagueOfLegendsIcon.png" />
+    <Resource Include="Assets\Images\TwitterSocial.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Unosquare.Swan" Version="3.0.0" />
+    <PackageReference Include="WPFChromeTabsMVVM" Version="1.3.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MVVM\Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LeagueBroadcast.Common\Common.csproj" />
+    <ProjectReference Include="..\LeagueBroadcast.Server\Server.csproj" />
+    <ProjectReference Include="..\LeagueBroadcast.Update\Update.csproj" />
+    <ProjectReference Include="..\LeagueBroadcast.Utils\Utils.csproj" />
+  </ItemGroup>
+
+  <Target Name="CustomActionsAfterPublish" AfterTargets="Publish">
+    <Exec Command="cd $(SolutionDir)Overlays\ingame\&#xD;&#xA;call npm run build&#xD;&#xA;if not exist $(SolutionDir)Publish\Frontend\ mkdir $(SolutionDir)Publish\Frontend\&#xD;&#xA;cd $(SolutionDir)Publish\Frontend&#xD;&#xA;md ingame&#xD;&#xA;md pickban&#xD;&#xA;xcopy &quot;$(SolutionDir)Overlays\ingame\dist&quot; &quot;$(SolutionDir)Publish\Frontend\ingame&quot; /E/H&#xD;&#xA;xcopy &quot;$(SolutionDir)Overlays\pickban&quot; &quot;$(SolutionDir)Publish\Frontend\pickban&quot; /E/H&#xD;&#xA;cd $(SolutionDir)Publish&#xD;&#xA;&quot;C:\Program Files\7-Zip\7z.exe&quot; a LeagueBroadcast-1.x.x.zip *&#xD;&#xA; if exist &quot;$(SolutionDir)Releases\LeagueBroadcast-1.x.x.zip&quot; del &quot;$(SolutionDir)Releases\LeagueBroadcast-1.x.x.zip&quot;&#xD;&#xA;move LeagueBroadcast-1.x.x.zip $(SolutionDir)Releases&#xD;&#xA;rmdir /S /Q $(SolutionDir)Publish\&#xD;&#xA;&#xD;&#xA;" />
+  </Target>
+  
+</Project>

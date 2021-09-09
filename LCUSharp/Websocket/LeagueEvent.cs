@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace LCUSharp.Websocket
 {
@@ -11,19 +11,19 @@ namespace LCUSharp.Websocket
         /// <summary>
         /// The event's data.
         /// </summary>
-        [JsonProperty("data")]
-        public JToken Data { get; set; }
+        [JsonPropertyName("data")]
+        public JsonElement Data { get; set; }
 
         /// <summary>
         /// The event's type.
         /// </summary>
-        [JsonProperty("eventType")]
+        [JsonPropertyName("eventType")]
         public string EventType { get; set; }
 
         /// <summary>
         /// The event's uri.
         /// </summary>
-        [JsonProperty("uri")]
+        [JsonPropertyName("uri")]
         public string Uri { get; set; }
     }
 }

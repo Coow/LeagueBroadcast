@@ -1,0 +1,87 @@
+﻿<Window x:Class="Client.MVVM.Controls.DockingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client.MVVM.Controls"
+        mc:Ignorable="d"
+        Title="LeagueBroadcast" Height="720" Width="1280"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundColorBrush}"
+        ResizeMode="CanMinimize"
+        Loaded="Window_Loaded">
+    <Window.Resources>
+        <Storyboard x:Key="FadeInContentAnim">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility"
+                                           Storyboard.TargetName="ContentControl">
+                <DiscreteObjectKeyFrame Value="{x:Static Visibility.Visible}"
+                                        KeyTime="0:0:0.1" />
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.ColumnSpan="2" Background="{StaticResource VeryDarkBackgroundColorBrush}">
+
+            <Grid HorizontalAlignment="Stretch" MouseLeftButtonDown="HeaderBar_MouseDown">
+                <Image Source="pack://application:,,,/Assets/Images/BE_Icon.png" HorizontalAlignment="Left" Margin="10,4,0,4"/>
+                <Label x:Name="WindowTitle" Foreground="Gray" FontWeight="SemiBold" Margin="30,-1,0,0"/>
+                <StackPanel HorizontalAlignment="Right" 
+                            Orientation="Horizontal">
+
+                    <Button x:Name="ConnectionStatus"
+                            Height="22"
+                            Style="{StaticResource ConnectionStatusTheme}"
+                            Background="{Binding Path=BackgroundColor}"
+                            BorderBrush="{Binding Path=BorderColor}"
+                            BorderThickness="{Binding Path=BorderThickness}"
+                            Foreground="{Binding Path=TextColor}"
+                            Content="{Binding Path=TextContent}"
+                            FontSize="11"
+                            Margin="0,0,50,0"/>
+                    
+
+                    <Button Width="20" Height="20" 
+                            Content="🗕" 
+                            Background="Transparent" 
+                            BorderThickness="0" 
+                            Foreground="Gray" 
+                            FontWeight="Black"
+                            Margin="0,0,0,2.5"
+                            Click="MinimizeApp_Click"/>
+                    <Button Width="20" Height="20" 
+                            Content="☐" 
+                            Background="Transparent" 
+                            BorderThickness="0" 
+                            Foreground="Gray" 
+                            FontWeight="Black"
+                            Margin="0,0,0,0"
+                            Click="AppState_Click"/>
+                    <Button Width="20" Height="20" 
+                            Content="✕" 
+                            Background="Transparent" 
+                            BorderThickness="0" 
+                            Foreground="Gray" 
+                            FontWeight="Black"
+                            Margin="0,0,0,0"
+                            Click="ExitApp_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Grid Grid.Row="2">
+            <ContentControl x:Name="ContentControl"
+                        Visibility="Collapsed"
+                        Content="{Binding}" />
+        </Grid>
+    </Grid>
+</Window>

@@ -1,10 +1,9 @@
-﻿using LCUSharp.Utility;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LCUSharp.Http
@@ -65,7 +64,7 @@ namespace LCUSharp.Http
         public async Task<TResponse> GetResponseAsync<TRequest, TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TRequest body)
         {
             var json = await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
-            return await Task.Run(() => JsonConvert.DeserializeObject<TResponse>(json)).ConfigureAwait(false);
+            return await Task.Run(() => JsonSerializer.Deserialize<TResponse>(json)).ConfigureAwait(false);
         }
     }
 }

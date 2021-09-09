@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LCUSharp.Http
@@ -60,7 +60,7 @@ namespace LCUSharp.Http
 
             if (body != null)
             {
-                var json = await Task.Run(() => JsonConvert.SerializeObject(body)).ConfigureAwait(false);
+                var json = await Task.Run(() => JsonSerializer.Serialize(body)).ConfigureAwait(false);
                 request.Content = new StringContent(json, Encoding.UTF8, "application/json");
             }
 

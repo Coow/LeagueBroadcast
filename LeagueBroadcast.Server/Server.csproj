@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EmbedIO" Version="3.4.3" />
+    <PackageReference Include="Unosquare.Swan" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LCUSharp\LCUSharp.csproj" />
+    <ProjectReference Include="..\LeagueBroadcast.Common\Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Ingame\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="PostGame\" />
+    <Folder Include="PreGame\" />
+  </ItemGroup>
+
+</Project>

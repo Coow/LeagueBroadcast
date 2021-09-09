@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.WebSockets;
 using System.Reactive.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Websocket.Client;
 
@@ -82,18 +83,21 @@ namespace LCUSharp.Websocket
                 .Subscribe(msg =>
                 {
                     // Check if the message is json received from the client
-                    var eventArray = JArray.Parse(msg.Text);
-                    var eventNumber = eventArray?[0].ToObject<int>();
+                    //var eventArray = JArray.Parse(msg.Text);
+                    //var eventArray = JsonSerializer.Deserialize<dynamic[]>(msg.Text);
+                    using JsonDocument response = JsonDocument.Parse(msg.Text);
+
+                    int eventNumber = response.RootElement[0].GetInt32();
 
                     if (eventNumber != ClientEventNumber)
                     {
                         return;
                     }
 
-                    var leagueEvent = eventArray[ClientEventData].ToObject<LeagueEvent>();
+                    LeagueEvent leagueEvent = JsonSerializer.Deserialize<LeagueEvent>(response.RootElement[ClientEventData].GetRawText());
                     MessageReceived?.Invoke(this, leagueEvent);
 
-                    if (!_subscribers.TryGetValue(leagueEvent.Uri, out var eventHandlers))
+                    if (!_subscribers.TryGetValue(leagueEvent.Uri, out List<EventHandler<LeagueEvent>> eventHandlers))
                     {
                         return;
                     }
