@@ -292,22 +292,22 @@ namespace Farsight
         public class Offsets
         {
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int Manager = 0x17239D0;
+            public int Manager { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int MapCount = 0x2c;
+            public int MapCount { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int MapRoot = 0x28;
+            public int MapRoot { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int MapNodeNetId = 0x10;
+            public int MapNodeNetId { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int MapNodeObject = 0x14;
+            public int MapNodeObject { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int GameTime = 0x14;
+            public int GameTime { get; set; }
         }
     }
 }

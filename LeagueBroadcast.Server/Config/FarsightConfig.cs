@@ -4,6 +4,7 @@ using Common.Config.Files;
 using Common.Http;
 using Farsight;
 using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Utils;
 using Utils.Log;
@@ -51,14 +52,17 @@ namespace Server.Config
             $"Fetching new offsets from {remoteUri}".Info();
             try
             {
-                FarsightConfig? remoteCfg = RestRequester.GetAsync<FarsightConfig>(remoteUri).Result;
+                string remoteContent = RestRequester.GetRaw(remoteUri).Result;
+                FarsightConfig? remoteCfg = JsonSerializer.Deserialize<FarsightConfig>(remoteContent);
 
-                if(remoteCfg is null)
+                if(remoteCfg is null || remoteContent.Length == 0)
                 {
                     $"Updated offsets not found".Error();
                     FarsightDataProvider.ShouldRun = false;
                     return;
                 }
+                $"{remoteContent}".Debug();
+                $"{JsonSerializer.Serialize(remoteCfg)}".Debug();
                 remoteCfg.CopyProperties(this);
                 $"Offsets updated to {Versions.Client}".Info();
             }
@@ -72,7 +76,7 @@ namespace Server.Config
 
     public class Offsets
     {
-        public FarsightDataProvider.Offsets? Global;
-        public GameObject.Offsets? GameObject;
+        public FarsightDataProvider.Offsets? Global { get; set; }
+        public GameObject.Offsets? GameObject { get; set; }
     }
 }

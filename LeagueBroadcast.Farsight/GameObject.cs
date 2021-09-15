@@ -94,52 +94,52 @@ namespace Farsight
         public class Offsets
         {
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int ID = 0x20;
+            public int ID { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int NetworkID = 0xCC;
+            public int NetworkID { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int Team = 0x4C;
+            public int Team { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int Pos = 0xF0;
+            public int Pos { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int Mana = 0x298;
+            public int Mana { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int MaxMana = 0x2A8;
+            public int MaxMana { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int Health = 0xD98;
+            public int Health { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int MaxHealth = 0xDA8;
+            public int MaxHealth { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int CurrentGold = 0x1B80;
+            public int CurrentGold { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int GoldTotal = 0x1B90;
+            public int GoldTotal { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int EXP = 0x334C;
+            public int EXP { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int Name = 0x2BBC;
+            public int Name { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int ItemList;
+            public int ItemList { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int ItemListItem;
+            public int ItemListItem { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int ItemInfo;
+            public int ItemInfo { get; set; }
 
             [JsonConverter(typeof(HexStringJsonConverter))]
-            public int ItemInfoId;
+            public int ItemInfoId { get; set; }
         }
     }
 }

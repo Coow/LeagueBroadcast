@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Globalization;
 
 namespace Common.JsonConverters
 {
@@ -8,7 +9,15 @@ namespace Common.JsonConverters
     {
         public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return reader.GetInt32();
+            string num = reader.GetString() ?? "";
+            int hexNum;
+            if (num.StartsWith("0x", StringComparison.CurrentCultureIgnoreCase) || num.StartsWith("&H", StringComparison.CurrentCultureIgnoreCase))
+                num = num.Substring(2);
+
+            bool parsedSuccessfully = int.TryParse(num, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out hexNum);
+            if(parsedSuccessfully)
+                return hexNum;
+            return -1;
         }
 
         public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
