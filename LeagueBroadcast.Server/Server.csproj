@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <None Remove="Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EmbedIO" Version="3.4.3" />
     <PackageReference Include="Unosquare.Swan" Version="3.0.0" />
   </ItemGroup>
@@ -14,11 +20,10 @@
   <ItemGroup>
     <ProjectReference Include="..\LCUSharp\LCUSharp.csproj" />
     <ProjectReference Include="..\LeagueBroadcast.Common\Common.csproj" />
+    <ProjectReference Include="..\LeagueBroadcast.Farsight\Farsight.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Ingame\" />
-    <Folder Include="Controllers\" />
     <Folder Include="PostGame\" />
     <Folder Include="PreGame\" />
   </ItemGroup>

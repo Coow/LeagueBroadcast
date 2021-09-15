@@ -38,7 +38,7 @@ namespace Server.Http
 
         private static WebServer CreateWebServer(string url)
         {
-            var webRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
+            var webRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Cache");
             $"Server file system starting".Info();
             var server = new WebServer(o => o
                     .WithUrlPrefix(url)

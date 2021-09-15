@@ -41,7 +41,7 @@ namespace Common.Http
             };
         }
 
-        public static async Task<TResultType> GetAsync<TResultType>(string url)
+        public static async Task<TResultType?> GetAsync<TResultType>(string url)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace Common.Http
                 if (!response.IsSuccessStatusCode)
                 {
                     $"Request to {url} ({nameof(TResultType)} = {typeof(TResultType).Name}) returned status code {response.StatusCode}.".Warn();
-                    return default!;
+                    return default;
                 }
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return JsonSerializer.Deserialize<TResultType>(json)!;
@@ -57,7 +57,7 @@ namespace Common.Http
             catch (TaskCanceledException)
             {
                 $"Request to {url} caused a {nameof(TaskCanceledException)}. This is usually an indicator for a timeout.".Warn();
-                return default!;
+                return default;
             }
         }
 

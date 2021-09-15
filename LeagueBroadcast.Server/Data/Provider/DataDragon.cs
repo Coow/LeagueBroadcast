@@ -41,8 +41,8 @@ namespace Server.Data.Provider
 
                 new Task(async () =>
                 {
-                    StringVersion patch = await GetLatestGameVersion();
-                    await Init(patch);
+                    await GetLatestGameVersion();
+                    await Init();
                 }).Start();
 
             }
@@ -55,14 +55,14 @@ namespace Server.Data.Provider
                     if (!StringVersion.TryParse(_cfg.Patch, out StringVersion? requestedPatch))
                     {
                         "[CDrag] Could not read requested game version. Falling back to latest".Warn();
-                        requestedPatch = await GetLatestGameVersion();
+                        await GetLatestGameVersion();
                     }
-                    await Init(requestedPatch!);
+                    await Init();
                 }).Start();
             }
         }
 
-        private static async Task<StringVersion> GetLatestGameVersion()
+        private static async Task GetLatestGameVersion()
         {
             "Retrieving latest patch info".UpdateLoadStatus();
             "[CDrag] Retrieving latest patch info".Info();
@@ -74,28 +74,32 @@ namespace Server.Data.Provider
                 using JsonDocument response = JsonDocument.Parse(await RestRequester.GetRaw($"https://ddragon.leagueoflegends.com/realms/{_cfg.Region}.json"), new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
                 rawCDragVersionResponse = response.RootElement.GetProperty("n").GetProperty("champion").ToString();
             }
-            StringVersion CDragVersion = StringVersion.Parse(rawCDragVersionResponse.Split("+")[0]);
+            Versions.CDrag = StringVersion.Parse(rawCDragVersionResponse.Split("+")[0]);
 
-            $"[CDrag] Using live patch {CDragVersion} on platform {_cfg.Region}".Info();
+            $"[CDrag] Using live patch {Versions.CDrag} on platform {_cfg.Region}".Info();
 
-            if (CDragVersion > StringVersion.Parse($"{GetLatestLocalPatch().ToString(2)}.1"))
+            $"{Versions.CDrag.ToString(2)}, {GetLatestLocalPatch().ToString(2)}".Info();
+
+            if (StringVersion.Parse(Versions.CDrag.ToString(2)) > StringVersion.Parse(GetLatestLocalPatch().ToString(2)))
             {
-                $"[CDrag] New patch {CDragVersion} detected".Info();
-                ConfigController.Get<RCVolusPickBanConfig>().Frontend.Patch = CDragVersion.ToString(2);
+                $"[CDrag] New patch {Versions.CDrag} detected".Info();
+                ConfigController.Get<RCVolusPickBanConfig>().Frontend.Patch = Versions.CDrag.ToString(2);
                 await ConfigController.WriteConfigAsync<RCVolusPickBanConfig>();
             }
-
-            return CDragVersion;
         }
 
         private static StringVersion GetLatestLocalPatch()
         {
-            string patchDir = Path.Combine(_currentDir, "Data", "Cache");
+            string patchDir = Path.Combine(_currentDir, "Cache");
             if (Directory.Exists(patchDir))
-                return Directory.GetDirectories(patchDir).Where(dir => dir.Count(c => c == '.') == 3).Select(dir => StringVersion.Parse(dir)).Max() ?? StringVersion.Zero;
+            {
+                $"Found cache folder".Debug();
+                return Directory.GetDirectories(patchDir).Select(Path.GetFileName).Where(dir => dir.Count(c => c == '.') == 2).Select(dir => StringVersion.Parse(dir)).Max() ?? StringVersion.Zero;
+            }
+                
             return new(0, 0, 0);
         }
-        private static async Task Init(StringVersion currentPatch)
+        private static async Task Init()
         {
 
             Champion.All = (await RestRequester.GetAsync<HashSet<Champion>>($"{_cfg.CDragonRaw}/{_cfg.Patch}/plugins/rcp-be-lol-game-data/{_cfg.Region}/default/v1/champion-summary.json")).Where(c => c.ID > 0).ToHashSet();
@@ -107,7 +111,7 @@ namespace Server.Data.Provider
             Item.All = await RestRequester.GetAsync<HashSet<Item>>($"{_cfg.CDragonRaw}/{_cfg.Patch}/plugins/rcp-be-lol-game-data/{_cfg.Region}/default/v1/items.json");
             $"[CDrag] Loaded {Item.All.Count} full items".Info();
 
-            bool result = await VerifyLocalCache(currentPatch);
+            bool result = await VerifyLocalCache(Versions.CDrag);
 
             LoadComplete?.Invoke(null, EventArgs.Empty);
         }
@@ -177,26 +181,42 @@ namespace Server.Data.Provider
             
             foreach (Champion champ in Champion.All)
             {
+                //Check if all files for the champ exist
+                bool loadingExists = File.Exists($"{location}/{champ.Alias}_loading.png");
+                bool splashExists = File.Exists($"{location}/{champ.Alias}_splash.png");
+                bool centeredSplashExists = File.Exists($"{location}/{champ.Alias}_centered_splash.png");
+                bool squareExists = File.Exists($"{location}/{champ.Alias}_square.png");
+
+                if (loadingExists && splashExists && centeredSplashExists && squareExists)
+                {
+                    FileDownloadComplete?.Invoke(null, new FileLoadProgressEventArgs(champ.Alias, "Verified", IncrementDownloaded(4), _toDownload));
+                    return;
+                }
+
+                //Get champ data if not all files exist
                 await ExtendChampion(champ, _cfg.Patch);
-                if (!File.Exists($"{location}/{champ.Alias}_loading.png"))
+
+                //Get missing files
+                if (!loadingExists)
                 {
                     DownloadAsset(champ.LoadingImg!, $"{location}/{champ.Alias}_loading.png", $"{champ.Alias}_loading.png", failedDownloads);
                 }
 
-                if (!File.Exists($"{location}/{champ.Alias}_splash.png"))
+                if (!splashExists)
                 {
                     DownloadAsset(champ.SplashImg!, $"{location}/{champ.Alias}_splash.png", $"{champ.Alias}_splash.png", failedDownloads);
                 }
 
-                if (!File.Exists($"{location}/{champ.Alias}_centered_splash.png"))
+                if (!centeredSplashExists)
                 {
                     DownloadAsset(champ.SplashCenteredImg!, $"{location}/{champ.Alias}_centered_splash.png", $"{champ.Alias}_centered_splash.png", failedDownloads);
                 }
 
-                if (!File.Exists($"{location}/{champ.Alias}_square.png"))
+                if (!squareExists)
                 {
                     DownloadAsset(champ.SquareImg!, $"{location}/{champ.Alias}_square.png", $"{champ.Alias}_square.png", failedDownloads);
                 }
+
                 FileDownloadComplete?.Invoke(null, new FileLoadProgressEventArgs(champ.Alias, "Verified", IncrementDownloaded(4), _toDownload));
             };
         }

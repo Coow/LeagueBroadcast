@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 using Server.Data.Provider;
 using Common;
 using Server.Http;
+using Farsight;
+using Common.Config;
+using Server.Config;
 
 namespace Server
 {
     public class ServerController : TickController
     {
         public static event EventHandler? PreInitComplete, InitComplete, LateInitComplete;
-
-        public static StringVersion LocalGameVersion { get; set; } = new(0, 0, 0);
 
         private static readonly ServerController _instance = new();
 
@@ -72,11 +73,17 @@ namespace Server
         {
             AppStatus.UpdateStatus(ConnectionStatus.Connecting);
 
-                string[] patchComponents = (await ClientDataProvider.API!.RequestHandler.GetResponseAsync<string>(HttpMethod.Get, "/lol-patch/v1/game-version")).Split(".");
-                LocalGameVersion = new(int.Parse(patchComponents[0]),
-                                       int.Parse(patchComponents[1]),
-                                       1);
+            string[] patchComponents = (await ClientDataProvider.API!.RequestHandler.GetResponseAsync<string>(HttpMethod.Get, "/lol-patch/v1/game-version")).Split(".");
+            Versions.Client = new(int.Parse(patchComponents[0]),
+                                   int.Parse(patchComponents[1]),
+                                   1);
 
+            $"Determined Client version. Updating farsight values".Info();
+            FarsightConfig cfg = await ConfigController.GetAsync<FarsightConfig>();
+            FarsightDataProvider.ObjectOffsets = cfg.Offsets.GameObject!;
+            FarsightDataProvider.GameOffsets = cfg.Offsets.Global!;
+
+            await FarsightDataProvider.Init();
 
             AppStatus.UpdateStatus(ConnectionStatus.Connected);
         }

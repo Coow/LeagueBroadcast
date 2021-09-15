@@ -50,7 +50,7 @@ namespace Server.Config
             Ingame = new()
             {
                 IsActive = true,
-                UseIngameAPI = false,
+                UseFarsightAPI = true,
                 UseLiveEventAPI = true
             };
             PickBan = new()
@@ -113,12 +113,12 @@ namespace Server.Config
             set { _isActive = value; OnPropertyChanged(); }
         }
 
-        private bool _useIngameAPI;
+        private bool _useFarsightAPI;
 
-        public bool UseIngameAPI
+        public bool UseFarsightAPI
         {
-            get { return _useIngameAPI; }
-            set { _useIngameAPI = value; OnPropertyChanged(); }
+            get { return _useFarsightAPI; }
+            set { _useFarsightAPI = value; OnPropertyChanged(); }
         }
 
         private bool _useLiveEventAPI;
@@ -128,6 +128,7 @@ namespace Server.Config
             get { return _useLiveEventAPI; }
             set { _useLiveEventAPI = value; OnPropertyChanged(); }
         }
+
 
     }
 
