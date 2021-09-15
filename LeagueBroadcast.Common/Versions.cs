@@ -9,8 +9,8 @@ namespace Common
 {
     public static class Versions
     {
-        public static StringVersion CDrag { get; set; } = new();
+        public static StringVersion CDrag { get; set; } = new(0);
 
-        public static StringVersion Client { get; set; } = new();
+        public static StringVersion Client { get; set; } = new(0);
     }
 }

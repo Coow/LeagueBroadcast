@@ -9,6 +9,12 @@ using Server.Config;
 using Common.Config.Files;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
+using System.Threading;
+using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Server.Data.Provider
 {
@@ -25,8 +31,8 @@ namespace Server.Data.Provider
         private static int IncrementDownloaded() => Interlocked.Increment(ref _downloaded);
         private static int IncrementDownloaded(int count) => Interlocked.Add(ref _downloaded, count);
 
-        public static EventHandler? LoadComplete;
-        public static EventHandler<FileLoadProgressEventArgs>? FileDownloadComplete;
+        public static EventHandler? LoadComplete { get; set; }
+        public static EventHandler<FileLoadProgressEventArgs>? FileDownloadComplete { get; set; }
 
         public static void Startup()
         {
@@ -94,7 +100,7 @@ namespace Server.Data.Provider
             if (Directory.Exists(patchDir))
             {
                 $"Found cache folder".Debug();
-                return Directory.GetDirectories(patchDir).Select(Path.GetFileName).Where(dir => dir.Count(c => c == '.') == 2).Select(dir => StringVersion.Parse(dir)).Max() ?? StringVersion.Zero;
+                return Directory.GetDirectories(patchDir).Select(Path.GetFileName).Where(dir => dir!.Count(c => c == '.') == 2).Select(dir => StringVersion.Parse(dir)).Max() ?? StringVersion.Zero;
             }
                 
             return new(0, 0, 0);
@@ -166,7 +172,7 @@ namespace Server.Data.Provider
 
             if (_downloaded == _toDownload)
             {
-                _downloadComplete.TrySetResult(failedDownloads.Count == 0);
+                _ = _downloadComplete.TrySetResult(failedDownloads.IsEmpty);
             }
                 
             bool updateResult = await _downloadComplete.Task;

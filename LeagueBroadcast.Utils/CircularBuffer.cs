@@ -47,7 +47,7 @@ namespace Utils
         /// Buffer capacity. Must be positive.
         /// </param>
         public CircularBuffer(int capacity)
-            : this(capacity, new T[] { })
+            : this(capacity, Array.Empty<T>())
         {
         }
 
@@ -390,7 +390,7 @@ namespace Utils
         {
             if (IsEmpty)
             {
-                return new ArraySegment<T>(new T[0]);
+                return new ArraySegment<T>(Array.Empty<T>());
             }
             else if (_start < _end)
             {
@@ -406,7 +406,7 @@ namespace Utils
         {
             if (IsEmpty)
             {
-                return new ArraySegment<T>(new T[0]);
+                return new ArraySegment<T>(Array.Empty<T>());
             }
             else if (_start < _end)
             {

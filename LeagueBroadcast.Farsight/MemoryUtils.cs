@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Utils.Log;
@@ -133,8 +134,7 @@ namespace Farsight
 
         public static int GetChampionObjectSize(int Address)
         {
-            var res = new MEMORY_BASIC_INFORMATION();
-            VirtualQueryEx((int)m_pProcessHandle, Address, out res, Convert.ToUInt32(Marshal.SizeOf(typeof(MEMORY_BASIC_INFORMATION))));
+            VirtualQueryEx((int)m_pProcessHandle, Address, out MEMORY_BASIC_INFORMATION res, Convert.ToUInt32(Marshal.SizeOf(typeof(MEMORY_BASIC_INFORMATION))));
             $"Champ region size: {res.RegionSize}".Debug();
             return res.RegionSize > 0 ? res.RegionSize : 0x3A00;
         }

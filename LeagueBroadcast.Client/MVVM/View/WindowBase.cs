@@ -48,7 +48,7 @@ namespace Client.MVVM.View
                     DataContext = draggedTab
                 };
 
-                win.Closed += win_Closed;
+                win.Closed += Win_Closed;
                 win.Loaded += Win_Loaded;
                 win.LocationChanged += Win_LocationChanged;
                 win.Tag = position;
@@ -98,7 +98,7 @@ namespace Client.MVVM.View
             }));
         }
         //remove the window from the open windows collection when it is closed.
-        private void win_Closed(object? sender, EventArgs e)
+        private void Win_Closed(object? sender, EventArgs e)
         {
             if (sender is null)
                 return;
@@ -110,13 +110,13 @@ namespace Client.MVVM.View
             Window win = (Window)sender;
             if (!win.IsLoaded)
                 return;
-            W32Point pt = new W32Point();
+            W32Point pt = new();
             if (!Win32.GetCursorPos(ref pt))
             {
                 Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
             }
 
-            Point absoluteScreenPos = new Point(pt.X, pt.Y);
+            Point absoluteScreenPos = new(pt.X, pt.Y);
 
             var windowUnder = FindWindowUnderThisAt(win, absoluteScreenPos);
 

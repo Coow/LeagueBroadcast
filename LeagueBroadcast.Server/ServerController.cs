@@ -11,6 +11,7 @@ using Server.Http;
 using Farsight;
 using Common.Config;
 using Server.Config;
+using System.Net.Http;
 
 namespace Server
 {

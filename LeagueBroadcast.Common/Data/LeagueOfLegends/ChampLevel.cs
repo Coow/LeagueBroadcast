@@ -1,4 +1,6 @@
-﻿using Utils.Log;
+﻿using System;
+using System.Collections.Generic;
+using Utils.Log;
 
 namespace Common.Data.LeagueOfLegends
 {

@@ -1,5 +1,5 @@
 {
-   "FileVersion":"1.0",
+   "FileVersion":"2.0",
    "GameVersion":"11.18.1",
    "Offsets":{
       "Global":{
@@ -8,7 +8,7 @@
          "MapRoot":"0x28",
          "MapNodeNetId":"0x10",
          "MapNodeObject":"0x14",
-		 "GameTime":"0x30CB3AC"
+         "GameTime":"0x30CB3AC"
       },
       "GameObject":{
          "ID":"0x20",

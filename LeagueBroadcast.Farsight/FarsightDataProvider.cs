@@ -14,15 +14,15 @@ namespace Farsight
 {
     public class FarsightDataProvider
     {
-        public static HashSet<string> Champions = new();
+        public static HashSet<string> Champions { get; set; } = new();
 
-        public static Offsets GameOffsets = new();
-        public static GameObject.Offsets ObjectOffsets = new();
+        public static Offsets GameOffsets { get; set; } = new();
+        public static GameObject.Offsets ObjectOffsets { get; set; } = new();
 
         //Override to turn off memory reading at any point
-        public static bool ShouldRun = true;
+        public static bool ShouldRun { get; set; } = true;
 
-        public HashSet<string> BlacklistedObjectNames = new()
+        public HashSet<string> BlacklistedObjectNames { get; set; } = new()
         {
             "testcube",
             "testcuberender",
@@ -32,7 +32,7 @@ namespace Farsight
             "sru_plantrespawnmarker",
             "preseason_turret_shield"
         };
-        public List<int> BlacklistedObjects = new();
+        public List<int> BlacklistedObjects { get; set; } = new();
 
         private int ObjectManagerLocation = 0;
 

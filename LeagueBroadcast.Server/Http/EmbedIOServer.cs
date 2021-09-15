@@ -10,7 +10,7 @@ namespace Server.Http
     {
         private static WebServer? webServer;
 
-        private static WSServer? _socketServer;
+        private static readonly WSServer? _socketServer;
 
         public static WSServer SocketServer { get { return _socketServer ?? new("/api"); } }
 

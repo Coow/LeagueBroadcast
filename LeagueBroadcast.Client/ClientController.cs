@@ -11,9 +11,7 @@ using Utils;
 using Utils.Log;
 
 using System;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Client
 {
@@ -51,7 +49,7 @@ namespace Client
             $"Starting LeagueBroadcast Client v{StringVersion.CallingAppVersion}".Info();
 
             //Load app and client configs before anything else since this determines how to proceed with loading
-            if (!await ConfigController.RegisterConfigAsync<AppConfig>() || !await ConfigController.RegisterConfigAsync<ClientConfig>())
+            if (!(await ConfigController.RegisterConfigAsync<AppConfig>() && await ConfigController.RegisterConfigAsync<ClientConfig>()))
             {
                 //Something went very wrong...
                 throw new InvalidConfigException("Could not load main config file. App cannot run");

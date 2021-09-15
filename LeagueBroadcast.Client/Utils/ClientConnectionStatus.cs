@@ -63,14 +63,14 @@ namespace Client.Utils
             BackgroundColor = new SolidColorBrush(backgroundColor);
         }
 
-        public static ClientConnectionStatus DISCONNECTED = new(Colors.White, "DISCONNECTED", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
-        public static ClientConnectionStatus CONNECTING = new(Colors.White, "CONNECTING", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
-        public static ClientConnectionStatus CONNECTED = new(Colors.White, "CONNECTED", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
-        public static ClientConnectionStatus PREGAME = new(Colors.White, "IN CHAMP SELECT", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
-        public static ClientConnectionStatus INGAME = new(Colors.White, "INGAME", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
-        public static ClientConnectionStatus POSTGAME = new(Colors.White, "IN POST GAME", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
+        public static ClientConnectionStatus DISCONNECTED { get; set; } = new(Colors.White, "DISCONNECTED", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
+        public static ClientConnectionStatus CONNECTING { get; set; } = new(Colors.White, "CONNECTING", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
+        public static ClientConnectionStatus CONNECTED { get; set; } = new(Colors.White, "CONNECTED", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
+        public static ClientConnectionStatus PREGAME { get; set; } = new(Colors.White, "IN CHAMP SELECT", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
+        public static ClientConnectionStatus INGAME { get; set; } = new(Colors.White, "INGAME", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
+        public static ClientConnectionStatus POSTGAME { get; set; } = new(Colors.White, "IN POST GAME", Color.FromRgb(251, 105, 98), 3, Color.FromRgb(208, 126, 126));
 
-        public static Dictionary<ConnectionStatus, ClientConnectionStatus> ConnectionStatusMap = new Dictionary<ConnectionStatus, ClientConnectionStatus>() {
+        public static Dictionary<ConnectionStatus, ClientConnectionStatus> ConnectionStatusMap { get; set; } = new Dictionary<ConnectionStatus, ClientConnectionStatus>() {
             {ConnectionStatus.Disconnected, DISCONNECTED},
             {ConnectionStatus.Connected, CONNECTED},
             {ConnectionStatus.Connecting, CONNECTING},

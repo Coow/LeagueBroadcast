@@ -7,7 +7,7 @@ namespace Common.Interface
 {
     public abstract class TickController
     {
-        private static Dictionary<uint, TickTimer> _timers = new();
+        private static readonly Dictionary<uint, TickTimer> _timers = new();
 
         private static uint _tickRate = 500;
 
