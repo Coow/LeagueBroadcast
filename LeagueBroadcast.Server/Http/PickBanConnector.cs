@@ -1,39 +1,46 @@
-﻿using Common.Interface;
+﻿using Common.Config;
+using Common.Interface;
+using Server.Config;
+using Server.Events;
+using Server.PreGame.ChampSelect.Events;
+using Server.PreGame.ChampSelect.StateInfo;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Utils.Log;
 
 namespace Server.Http
 {
     class PickBanConnector : ITickable
-    {
-        public void DoTick()
-        {
-
-        }
-
-
-        /*
-        private ConcurrentDictionary<Events.LeagueEvent, double> EventQueue;
+    {   
+        private ConcurrentDictionary<LeagueEvent, double> EventQueue;
         private ClientConnectorMode connectionMode;
         public PickBanConnector()
         {
+            $"[ChampSelect] Init Connector".Debug();
             EventQueue = new();
-            if(ConfigController.Component.PickBan.UseDelay)
-            {
-                UseDelayPickBan();
-                return;
-            }
-            UseDirectPickBan();
+
+            ConfigController.Get<ComponentConfig>().PickBan.PropertyChanged += (s, e) => {
+                if(e.PropertyName!.Equals("UseDelay", StringComparison.Ordinal)) {
+                    ChangeConnectionType();
+                }
+            };
+
+            ChangeConnectionType();
         }
 
         public void DoTick()
         {
             EventQueue.Keys.ToList().ForEach(key => {
-                EventQueue[key] -= (double)(1 / (double)BroadcastController.TickRate);
+                EventQueue[key] -= TickController.TickRateInMS;
             });
 
-            var toRemove = EventQueue.Where(k => k.Value <= 0).ToList();
+            List<KeyValuePair<LeagueEvent, double>> toRemove = EventQueue.Where(k => k.Value <= 0).ToList();
             toRemove.ForEach(async e => {
                 EmbedIOServer.SocketServer.SendEventToAllAsync(e.Key);
-                EventQueue.TryRemove(e.Key, out var val);
+                _ = EventQueue.TryRemove(e.Key, out var val);
                 await Task.Delay(50);
             });
         }
@@ -42,11 +49,14 @@ namespace Server.Http
         {
             //Ignore same mode requests
             if (connectionMode == ClientConnectorMode.DELAYED)
-                return;
-            if (State.data.champSelectActive)
             {
-                Log.Warn("Tried enabling Champ Select Delay while active. Enable this while not in P&B!");
-                ConfigController.Component.PickBan.UseDelay = false;
+                return;
+            }
+
+            if (State.data.ChampSelectActive)
+            {
+                "[ChampSelect] Tried enabling Champ Select Delay while active. Enable this while not in P&B!".Info();
+                ConfigController.Get<ComponentConfig>().PickBan.UseDelay = false;
                 return;
             }
 
@@ -60,9 +70,9 @@ namespace Server.Http
             State.ChampSelectEnded -= SendEndDirect;
             State.ChampSelectEnded += AddEndToQueue;
 
-            BroadcastController.Instance.ToTick.Add(this);
+            _ = TickController.AddTickable(this);
             connectionMode = ClientConnectorMode.DELAYED;
-            Log.Info("Using delayed PickBan");
+            "[ChampSelect] Using delayed PickBan".Info();
         }
 
         public void UseDirectPickBan()
@@ -72,7 +82,7 @@ namespace Server.Http
                 return;
             if (EventQueue.Count != 0)
             {
-                Log.Warn("Disabled Champ Select Delay while P&B was still active! This might cause some errors");
+                "[ChampSelect] Disabled Champ Select Delay while P&B was still active! This might cause some errors".Warn();
                 EventQueue.Keys.ToList().ForEach(e => {
                     EmbedIOServer.SocketServer.SendEventToAllAsync(e);
                 });
@@ -89,24 +99,24 @@ namespace Server.Http
             State.ChampSelectEnded -= AddEndToQueue;
             State.ChampSelectEnded += SendEndDirect;
 
-            BroadcastController.Instance.ToTick.Remove(this);
+            _ = TickController.RemoveTickable(this);
             connectionMode = ClientConnectorMode.DIRECT;
-            Log.Info("Using direct PickBan");
+            "[ChampSelect] Using direct PickBan".Info();
         }
 
         private void AddToQueue(object sender, StateData e)
         {
-            EventQueue.TryAdd(new NewState(new StateData(e)), ConfigController.Component.PickBan.DelayValue);
+            EventQueue.TryAdd(new NewState(new StateData(e)), ConfigController.Get<ComponentConfig>().PickBan.DelayAmount);
         }
 
         private void AddToQueue(object sender, CurrentAction e)
         {
-            EventQueue.TryAdd(new NewActionEvent(new CurrentAction(e)), ConfigController.Component.PickBan.DelayValue);
+            EventQueue.TryAdd(new NewActionEvent(new CurrentAction(e)), ConfigController.Get<ComponentConfig>().PickBan.DelayAmount);
         }
 
         private void AddStartToQueue(object sender, EventArgs e)
         {
-            EventQueue.TryAdd(new ChampSelectStartEvent(), ConfigController.Component.PickBan.DelayValue);
+            EventQueue.TryAdd(new ChampSelectStartEvent(), ConfigController.Get<ComponentConfig>().PickBan.DelayAmount);
         }
 
         private void AddEndToQueue(object sender, bool finished)
@@ -117,7 +127,7 @@ namespace Server.Http
             //This eliminates champ select remakes from ever even showing up
             if (finished)
             {
-                EventQueue.TryAdd(new ChampSelectEndEvent(), ConfigController.Component.PickBan.DelayValue);
+                EventQueue.TryAdd(new ChampSelectEndEvent(), ConfigController.Get<ComponentConfig>().PickBan.DelayAmount);
                 return;
             }
 
@@ -151,12 +161,23 @@ namespace Server.Http
             EmbedIOServer.SocketServer.SendEventToAllAsync(new NewActionEvent(e));
         }
 
+        private void ChangeConnectionType()
+        {
+            
+            if (ConfigController.Get<ComponentConfig>().PickBan.UseDelay)
+            {
+                UseDelayPickBan();
+                return;
+            }
+            UseDirectPickBan();
+        }
+
         public enum ClientConnectorMode
         {
             NONE,
             DIRECT,
             DELAYED
         }
-        */
+        
     }
 }

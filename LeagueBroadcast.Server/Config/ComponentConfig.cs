@@ -142,5 +142,23 @@ namespace Server.Config
             get { return _isActive; }
             set { _isActive = value; OnPropertyChanged(); }
         }
+
+        private bool _useDelay;
+
+        public bool UseDelay
+        {
+            get { return _useDelay; }
+            set { _useDelay = value; OnPropertyChanged(); }
+        }
+
+
+        private int _delayAmount;
+
+        public int DelayAmount
+        {
+            get { return _delayAmount; }
+            set { _delayAmount = value; OnPropertyChanged(); }
+        }
+
     }
 }

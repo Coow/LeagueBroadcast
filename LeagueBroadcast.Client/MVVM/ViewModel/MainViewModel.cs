@@ -67,6 +67,7 @@ namespace Client.MVVM.ViewModel
             CanAddTabs = true;
             CanMoveTabs = true;
             ShowAddButton = true;
+            ConnectionStatus = ClientConnectionStatus.ConnectionStatusMap[AppStatus.CurrentStatus];
 
             AppStatus.StatusUpdate += (s, e) =>
             {

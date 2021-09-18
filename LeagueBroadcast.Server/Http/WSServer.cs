@@ -4,8 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Common.Config;
 using EmbedIO.WebSockets;
+using Server.Config;
 using Server.Events;
+using Server.PreGame.ChampSelect.Events;
+using Server.PreGame.ChampSelect.StateInfo;
 using Utils.Log;
 
 namespace Server.Http
@@ -14,9 +18,11 @@ namespace Server.Http
     {
         private static JsonSerializerOptions SerializerOptions = new JsonSerializerOptions() { WriteIndented = true };
         private List<IngameWSClient> clients;
+        private HashSet<IWebSocketContext> connections;
         public WSServer(string urlPath) : base(urlPath, true)
         {
             this.clients = new();
+            this.connections = new();
         }
 
 
@@ -44,14 +50,13 @@ namespace Server.Http
         protected override Task OnClientConnectedAsync(IWebSocketContext context)
         {
             $"New Client {context.Id} connected from {context.Origin}".Info();
-            //TODO send champ select state data if PickBan is active
-            //This is to enable compat with RCVolus frontends!
-            /*
-            if (ConfigController.Component.PickBan.IsActive)
+            
+            if (ConfigController.Get<ComponentConfig>().PickBan.IsActive)
             {
                 SendEventAsync(context, new NewState(State.data));
             }
-            */
+
+            connections.Add(context);
             return Task.CompletedTask;
         }
 
@@ -59,6 +64,7 @@ namespace Server.Http
         {
             //return SendToOthersAsync(context, "Someone left the chat room.");
             $"Client {context.Id} disconnected".Info();
+            connections.Remove(context);
             return Task.CompletedTask;
         }
 
@@ -74,12 +80,20 @@ namespace Server.Http
 
         public void SendEventToAllAsync(LeagueEvent leagueEvent)
         {
-            BroadcastAsync(JsonSerializer.Serialize(leagueEvent, SerializerOptions));
+            string toSend = JsonSerializer.Serialize((object)leagueEvent, SerializerOptions);
+            /*
+            foreach(IWebSocketContext c in connections)
+            {
+                SendAsync(c, toSend);
+            }
+            */
+            BroadcastAsync(toSend);
         }
 
         public void SendEventAsync(IWebSocketContext context, LeagueEvent leagueEvent)
         {
-            SendAsync(context, JsonSerializer.Serialize(leagueEvent, SerializerOptions));
+            string toSend = JsonSerializer.Serialize((object)leagueEvent, SerializerOptions);
+            _ = SendAsync(context, toSend);
         }
     }
 }

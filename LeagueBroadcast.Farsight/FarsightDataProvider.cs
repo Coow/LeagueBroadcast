@@ -40,7 +40,7 @@ namespace Farsight
         {
         }
 
-        public static async Task Init()
+        public static void Init()
         {
             Champions = Champion.All.Select(c => c.Alias).ToHashSet();
             $"Farsight loaded. Found {Champions.Count} Champ names".Info();

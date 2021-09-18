@@ -61,8 +61,6 @@ namespace Server.Config
                     FarsightDataProvider.ShouldRun = false;
                     return;
                 }
-                $"{remoteContent}".Debug();
-                $"{JsonSerializer.Serialize(remoteCfg)}".Debug();
                 remoteCfg.CopyProperties(this);
                 $"Offsets updated to {Versions.Client}".Info();
             }

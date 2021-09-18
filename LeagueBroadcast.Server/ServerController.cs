@@ -12,6 +12,7 @@ using Farsight;
 using Common.Config;
 using Server.Config;
 using System.Net.Http;
+using Server.PreGame.ChampSelect;
 
 namespace Server
 {
@@ -63,6 +64,16 @@ namespace Server
             InitComplete?.Invoke(null, EventArgs.Empty);
         }
 
+        public static void LateInit()
+        {
+            EmbedIOServer.Start("*", 9001);
+            "Starting Webserver".UpdateLoadStatus();
+
+            ChampSelectController.Init();
+
+            LateInitComplete?.Invoke(null, EventArgs.Empty);
+        }
+
         private static void ClientDataProvider_ClientConnected(object? sender, EventArgs e)
         {
             //Run once per session
@@ -74,27 +85,16 @@ namespace Server
         {
             AppStatus.UpdateStatus(ConnectionStatus.Connecting);
 
-            string[] patchComponents = (await ClientDataProvider.API!.RequestHandler.GetResponseAsync<string>(HttpMethod.Get, "/lol-patch/v1/game-version")).Split(".");
-            Versions.Client = new(int.Parse(patchComponents[0]),
-                                   int.Parse(patchComponents[1]),
-                                   1);
+            ClientDataProvider.GetLocalGameVersion();
 
-            $"Determined Client version. Updating farsight values".Info();
+            $"Determined Client version {Versions.Client}. Updating farsight values".Info();
             FarsightConfig cfg = await ConfigController.GetAsync<FarsightConfig>();
+
+            FarsightDataProvider.Init();
             FarsightDataProvider.ObjectOffsets = cfg.Offsets.GameObject!;
             FarsightDataProvider.GameOffsets = cfg.Offsets.Global!;
 
-            await FarsightDataProvider.Init();
-
             AppStatus.UpdateStatus(ConnectionStatus.Connected);
-        }
-
-        public static void LateInit()
-        {
-
-            EmbedIOServer.Start("*", 9001);
-            "Starting Webserver".UpdateLoadStatus();
-            LateInitComplete?.Invoke(null, EventArgs.Empty);
         }
     }
 }

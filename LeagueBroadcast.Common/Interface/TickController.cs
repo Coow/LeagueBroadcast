@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Timers;
+using Utils.Log;
 
 namespace Common.Interface
 {
@@ -9,45 +10,70 @@ namespace Common.Interface
     {
         private static readonly Dictionary<uint, TickTimer> _timers = new();
 
-        private static uint _tickRate = 500;
+        private static uint TickRate { get; set; } = (uint)500;
 
-        public uint TickRateInMS
+        public static uint TickRateInMS
         {
-            get { return _tickRate; }
-            set { _tickRate = value; }
+            get => TickRate;
+            set => TickRate = value;
         }
 
-        public uint TicksPerSecond
+        public static uint TicksPerSecond
         {
-            get { return 1 / _tickRate; }
-            set { _tickRate = 1 / value; }
+            get => 1 / TickRate;
+            set => TickRate = (uint)((1 / (decimal)value) * 1000);
         }
 
-        public static bool AddTickable(ITickable toTick, uint milliseconds = 0)
+        public static bool AddTickable(int position, ITickable toTick, uint milliseconds = 0)
         {
             if (toTick.IsTicking())
             {
                 return false;
             }
 
-            if(milliseconds == 0)
+            if (milliseconds == 0)
             {
-                milliseconds = _tickRate;
+                milliseconds = TickRateInMS;
             }
 
-            if (_timers[milliseconds] is null)
+            if (!_timers.ContainsKey(milliseconds))
             {
                 _timers.Add(milliseconds, new TickTimer(milliseconds).With(toTick));
                 return true;
             }
 
-            _timers[milliseconds].Add(toTick);
+            if (position == -1)
+            {
+                _timers[milliseconds].Add(toTick);
+            }
+            else
+            {
+                _timers[milliseconds].Add(position, toTick);
+            }
+
             return true;
+        }
+
+        public static bool AddTickable(ITickable toTick, uint milliseconds = 0)
+        {
+            return AddTickable(-1, toTick, milliseconds);
         }
 
         public static bool RemoveTickable(ITickable tickable)
         {
-            return _timers.Values.ToList().Any(timer => timer.Remove(tickable));
+            TickTimer? timer = _timers.Values.ToList().SingleOrDefault(timer => timer.Remove(tickable));
+            if (timer is null)
+            {
+                return false;
+            }
+
+            if(timer.IsEmpty())
+            {
+                _ = _timers.Remove(timer.TickRate);
+                timer.Dispose();
+            }
+
+            return true;
         }
 
         public static bool IsTicking(ITickable tickable)
@@ -65,29 +91,42 @@ namespace Common.Interface
 
     public class TickTimer : IDisposable
     {
+        public uint TickRate { get; }
         private readonly Timer _timer;
-        private readonly HashSet<ITickable> toTick;
+        private readonly List<ITickable> toTick;
 
         public TickTimer(uint milliseconds)
         {
-            var autoEvent = new AutoResetEvent(false);
-            _timer = new Timer(DoTick, autoEvent!, milliseconds, milliseconds);
-            toTick = new HashSet<ITickable>();
+            _timer = new Timer() { Interval = milliseconds, Enabled = true, AutoReset = true};
+            _timer.Elapsed += DoTick;
+            toTick = new List<ITickable>();
+            TickRate = milliseconds;
         }
 
-        public bool Add(ITickable tickable)
+        public void Add(ITickable tickable)
         {
-            return toTick.Add(tickable);
+            toTick.Add(tickable);
+        }
+        
+        public void Add(int position, ITickable tickable)
+        {
+            toTick.Insert(position, tickable);
         }
 
         public bool Remove(ITickable tickable)
         {
+
             return toTick.Remove(tickable);
         }
 
         public bool IsTicking(ITickable tickable)
         {
             return toTick.Contains(tickable);
+        }
+
+        public bool IsEmpty()
+        {
+            return toTick.Count == 0;
         }
 
 
@@ -102,7 +141,7 @@ namespace Common.Interface
             Dispose();
         }
 
-        private void DoTick(object? State)
+        private void DoTick(object? sender, EventArgs e)
         {
             foreach (ITickable toTick in toTick)
             {

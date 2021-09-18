@@ -63,8 +63,21 @@ namespace LCUSharp.Http
         /// <inheritdoc />
         public async Task<TResponse> GetResponseAsync<TRequest, TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TRequest body)
         {
-            var json = await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
-            return await Task.Run(() => JsonSerializer.Deserialize<TResponse>(json)).ConfigureAwait(false);
+            string json = await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
+
+            return json == ""
+                ? default
+                : await Task.Run(() =>
+                {
+                    try
+                    {
+                        return JsonSerializer.Deserialize<TResponse>(json);
+                    }
+                    catch
+                    {
+                        return default;
+                    }
+                }).ConfigureAwait(false);
         }
     }
 }

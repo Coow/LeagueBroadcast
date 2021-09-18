@@ -10,9 +10,16 @@ namespace Server.Http
     {
         private static WebServer? webServer;
 
-        private static readonly WSServer? _socketServer;
+        private static WSServer? _socketServer;
 
-        public static WSServer SocketServer { get { return _socketServer ?? new("/api"); } }
+        public static WSServer SocketServer { get {
+                if (_socketServer is null)
+                {
+                    _socketServer = new WSServer("/api");
+                }
+
+                return _socketServer;
+            } }
 
         public static void Start(string location, int port)
         {

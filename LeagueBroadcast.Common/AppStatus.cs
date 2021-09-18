@@ -9,6 +9,8 @@ namespace Common
         public static event EventHandler<ConnectionStatus>? StatusUpdate;
         public static event EventHandler<LoadProgressUpdateEventArgs>? LoadProgressUpdate;
 
+        public static ConnectionStatus CurrentStatus { get; set; }
+
         public static void UpdateLoadStatus(this string status)
         {
             LoadStatusUpdate?.Invoke(null, status);
@@ -16,6 +18,7 @@ namespace Common
 
         public static void UpdateStatus(this ConnectionStatus status)
         {
+            CurrentStatus = status;
             StatusUpdate?.Invoke(null, status);
         }
 

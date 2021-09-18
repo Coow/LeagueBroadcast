@@ -1,12 +1,17 @@
-﻿namespace Server.Events
+﻿using System.Text.Json.Serialization;
+
+namespace Server.Events
 {
     public abstract class LeagueEvent
     {
-        public string eventType {  get; set; }
+        [JsonPropertyName("eventType")]
+        public string EventType {  get; set; }
 
         public LeagueEvent(string eventType)
         {
-            this.eventType = eventType;
+            EventType = eventType;
         }
+
+        public LeagueEvent() { }
     }
 }

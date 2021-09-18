@@ -195,8 +195,9 @@ namespace Server.Data.Provider
 
                 if (loadingExists && splashExists && centeredSplashExists && squareExists)
                 {
+                    ExtendChampionLocal(champ, Versions.CDrag);
                     FileDownloadComplete?.Invoke(null, new FileLoadProgressEventArgs(champ.Alias, "Verified", IncrementDownloaded(4), _toDownload));
-                    return;
+                    continue;
                 }
 
                 //Get champ data if not all files exist
@@ -223,8 +224,12 @@ namespace Server.Data.Provider
                     DownloadAsset(champ.SquareImg!, $"{location}/{champ.Alias}_square.png", $"{champ.Alias}_square.png", failedDownloads);
                 }
 
+                ExtendChampionLocal(champ, Versions.CDrag);
+
                 FileDownloadComplete?.Invoke(null, new FileLoadProgressEventArgs(champ.Alias, "Verified", IncrementDownloaded(4), _toDownload));
             };
+
+            $"[CDrag] Verified all champion assets".Info();
         }
 
 
@@ -237,6 +242,7 @@ namespace Server.Data.Provider
                 {
                     DownloadAsset($"{_cfg.CDragonRaw}/{_cfg.Patch}/plugins/rcp-be-lol-game-data/{_cfg.Region}/default/assets/items/icons2d/{item.IconPath.Split("/")[^1].ToLower()}", $"{location}/{item.ID}.png", $"{item.ID}.png", failedDownloads);
                 }
+                ExtendItemLocal(item, Versions.CDrag);
                 FileDownloadComplete?.Invoke(null, new FileLoadProgressEventArgs(item.Name, "Verified", IncrementDownloaded(), _toDownload));
             };
         }
@@ -250,6 +256,7 @@ namespace Server.Data.Provider
                 {
                     DownloadAsset($"{_cfg.CDragonRaw}/{_cfg.Patch}/plugins/rcp-be-lol-game-data/{_cfg.Region}/default/data/spells/icons2d/{spell.IconPath.Split("/")[^1].ToLower()}", $"{location}/{spell.ID}.png", $"{spell.ID}.png", failedDownloads);
                 }
+                ExtendSummonerLocal(spell, Versions.CDrag);
                 FileDownloadComplete?.Invoke(null, new FileLoadProgressEventArgs(spell.Name, "Verified", IncrementDownloaded(), _toDownload));
             };
         }
@@ -295,7 +302,7 @@ namespace Server.Data.Provider
 
         public static void ExtendChampionLocal(Champion champion, StringVersion version)
         {
-            string championPath = Path.Combine("cache", $"{version.ToString(2)}.1", "champion");
+            string championPath = $"cache/{version.ToString(2)}.1/champion";
             champion.SplashImg = $"{championPath}/{ champion.Alias}_splash.jpg";
             champion.SplashCenteredImg = $"{championPath}/{champion.Alias}_centered_splash.png";
             champion.SquareImg = $"{championPath}/{ champion.Alias}_square.png";
