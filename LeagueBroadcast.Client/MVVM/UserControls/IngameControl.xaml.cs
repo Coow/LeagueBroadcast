@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Trinket;
+using Utils.Log;
 
 namespace Client.MVVM.UserControls
 {
@@ -23,6 +25,17 @@ namespace Client.MVVM.UserControls
         public IngameControl()
         {
             InitializeComponent();
+            
+        }
+
+        private void EnableLiveEvent_Click(object sender, RoutedEventArgs e)
+        {
+            LiveEventDataProvider.Instance.Connect();
+        }
+
+        private void DisableLiveEvent_Click(object sender, RoutedEventArgs e)
+        {
+            LiveEventDataProvider.Instance.Disconnect();
         }
     }
 }

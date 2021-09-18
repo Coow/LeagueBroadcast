@@ -12,6 +12,7 @@ using Utils.Log;
 
 using System;
 using System.Windows;
+using Trinket;
 
 namespace Client
 {
@@ -92,6 +93,10 @@ namespace Client
 
         public static void Init()
         {
+            LiveEventDataProvider.Instance.OnConnect += (s, e) => "LiveEvent Connected".Info();
+            LiveEventDataProvider.Instance.OnLiveEvent += (s, e) => { e.ToString().Info(); };
+            LiveEventDataProvider.Instance.OnConnectionError += (s, e)  => { e.ToString().Info(); };
+
             InitComplete?.Invoke(null, EventArgs.Empty);
         }
 

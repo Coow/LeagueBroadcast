@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Utils.Log;
 
 namespace Server.PreGame.ChampSelect.StateInfo
 {
@@ -27,8 +28,8 @@ namespace Server.PreGame.ChampSelect.StateInfo
                 pick.Spell2 = new() { Name = cell.Spell2Id + "", IconPath = spell2 != null ? spell2.IconPath : "" };
 
                 pick.Champion = Champion.All.SingleOrDefault(c => c.ID == cell.ChampionId);
+                Summoner? summoner = ChampSelectController.Instance.Summoners.SingleOrDefault(s => s.SummonerId == cell.SummonerId);
 
-                Summoner summoner = ChampSelectController.Instance.Summoners.Single(s => s.SummonerId == cell.SummonerId);
                 if (summoner != null)
                 {
                     pick.DisplayName = summoner.DisplayName;

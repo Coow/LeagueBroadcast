@@ -8,6 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TextBlock Text="{Binding TestString}" Foreground="White"></TextBlock>
-        <TextBlock Text="TESTING" Margin="50" Foreground="White"/>
+        <StackPanel Margin="0,50,0,0">
+            <Button x:Name="EnableLiveEvent" Content="Enable LiveEventAPI" Width="250" Height="50" Click="EnableLiveEvent_Click"/>
+            <Button x:Name="DisableLiveEvent" Content="Disable LiveEventAPI" Width="250" Height="50" Margin="0,10,0,0" Click="DisableLiveEvent_Click"/>
+
+        </StackPanel>
+        
     </Grid>
 </UserControl>

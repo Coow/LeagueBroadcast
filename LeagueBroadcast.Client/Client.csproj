@@ -78,6 +78,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LeagueBroadcast.Common\Common.csproj" />
     <ProjectReference Include="..\LeagueBroadcast.Server\Server.csproj" />
+    <ProjectReference Include="..\LeagueBroadcast.Trinket\Trinket.csproj" />
     <ProjectReference Include="..\LeagueBroadcast.Update\Update.csproj" />
     <ProjectReference Include="..\LeagueBroadcast.Utils\Utils.csproj" />
   </ItemGroup>

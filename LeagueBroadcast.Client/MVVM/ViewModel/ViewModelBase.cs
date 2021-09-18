@@ -59,6 +59,8 @@ namespace Demo.ViewModel
             AddTabCommand = new RelayCommand(AddTabCommandAction, CanAddTabs);
             CloseTabCommand = new RelayCommand<TabBase>(CloseTabCommandAction);
             CanAddTabs = true;
+
+            ItemCollection.Add(CreateIngameTab());
         }
 
         protected static IngameControlViewModel CreateIngameTab()
