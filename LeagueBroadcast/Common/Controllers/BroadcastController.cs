@@ -12,6 +12,8 @@ using System.Windows;
 using LeagueBroadcast.Farsight;
 using static LeagueBroadcast.Common.Log;
 using LeagueBroadcast.Ingame.Data.Provider;
+using StreamDeckSharp;
+using OpenMacroBoard.SDK;
 
 namespace LeagueBroadcast.Common.Controllers
 {
@@ -136,8 +138,19 @@ namespace LeagueBroadcast.Common.Controllers
             Log.Info($"Init Complete in {(DateTime.Now - initFinish).ToString(@"s\.fff")}s");
             initFinish = DateTime.Now;
             InitComplete?.Invoke(null, EventArgs.Empty);
-            
 
+            //register streamdeck
+            var white = KeyBitmap.Create.FromRgb(255, 255, 255);
+
+
+            using (var deck = StreamDeck.OpenDevice())
+            {
+                deck.SetBrightness(100);
+                deck.SetKeyBitmap(1,white);
+
+
+                Console.ReadKey();
+            }
         }
 
         private void PostInit()
